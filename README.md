@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Scaled Dot-Product Attention
 
 Implementacao do mecanismo de Scaled Dot-Product Attention conforme descrito
@@ -112,3 +113,6 @@ antes da exponenciacao (tecnica padrao, sem alteracao matematica no resultado).
 
 Vaswani, A. et al. Attention Is All You Need. NeurIPS 2017.
 https://arxiv.org/abs/1706.03762
+=======
+# eletiva-3
+>>>>>>> b6df23fe5fdfd349c6d63b9fc92d457f2e50642e
