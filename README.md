@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Scaled Dot-Product Attention
 
 Implementacao do mecanismo de Scaled Dot-Product Attention conforme descrito
