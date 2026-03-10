@@ -1,117 +1,80 @@
-# Scaled Dot-Product Attention
+# Transformer Encoder "From Scratch"
 
-Implementacao do mecanismo de Scaled Dot-Product Attention conforme descrito
-no paper "Attention Is All You Need" (Vaswani et al., 2017).
+**Disciplina:** Tópicos em Inteligência Artificial – 2026.1  
+**Professor:** Prof. Dimmy Magalhães  
+**Instituição:** iCEV - Instituto de Ensino Superior
 
 ---
 
-## Estrutura do Repositorio
+## Descrição
 
-    .
-    attention.py        -> Implementacao principal
-    test_attention.py   -> Testes unitarios
-    README.md           -> Esta documentacao
+Implementação do Forward Pass de um bloco **Transformer Encoder** completo, seguindo a arquitetura do artigo *"Attention Is All You Need"* (Vaswani et al., 2017), utilizando apenas `Python 3.x`, `numpy` e `pandas`.
 
 ---
 
 ## Como Rodar
 
-### Pre-requisitos
+### Pré-requisitos
 
-- Python 3.10+
-- NumPy
+```bash
+pip install numpy pandas
+```
 
-    pip install numpy
+### Execução
 
-### Executar os testes
+```bash
+python transformer_encoder.py
+```
 
-    python test_attention.py
+A saída no terminal mostrará:
 
-Saida esperada:
-
-    =======================================================
-      Testes: Scaled Dot-Product Attention
-    =======================================================
-    ...
-      Resultado: 12/12 testes passaram.
-      Todos os testes PASSARAM com sucesso!
-    =======================================================
-
-### Usar a funcao diretamente
-
-    import numpy as np
-    from attention import scaled_dot_product_attention
-
-    Q = np.array([[1.0, 0.0],
-                  [0.0, 1.0]])
-    K = np.array([[1.0, 0.0],
-                  [0.0, 1.0]])
-    V = np.array([[1.0, 0.0],
-                  [0.0, 1.0]])
-
-    output, weights = scaled_dot_product_attention(Q, K, V)
-    print("Output:\n", output)
-    print("Attention Weights:\n", weights)
+1. O vocabulário e os IDs dos tokens
+2. O formato do tensor de entrada `(Batch, Tokens, d_model)`
+3. A passagem pelas 6 camadas do Encoder com confirmação das dimensões
+4. A validação de sanidade (entrada e saída com mesmo shape)
+5. Uma amostra dos primeiros valores do Vetor Z contextualizado
 
 ---
 
-## Equacao de Referencia
+## Estrutura do Código
 
-    Attention(Q, K, V) = softmax( QK^T / sqrt(d_k) ) * V
-
----
-
-## Como a Normalizacao sqrt(d_k) Foi Aplicada
-
-O produto escalar QK^T cresce em magnitude a medida que a dimensao d_k aumenta.
-Isso empurra o Softmax para regioes de gradiente muito pequeno (gradiente saturado).
-
-Para compensar, cada elemento da matriz de scores e dividido por sqrt(d_k)
-antes de aplicar o Softmax:
-
-    scaling_factor = np.sqrt(d_k)       # ex.: d_k=64 -> scaling=8.0
-    scores = (Q @ K.T) / scaling_factor # shape: (n_queries, n_keys)
-
-Essa divisao mantem a variancia dos scores aproximadamente constante (~1),
-independente de d_k, garantindo treinamento mais estavel.
-
-O Softmax e entao aplicado linha a linha (cada query normaliza sua distribuicao
-de atencao sobre todas as keys de forma independente):
-
-    attention_weights = softmax(scores)  # softmax ao longo de axis=-1
-
-Para estabilidade numerica, o Softmax subtrai o valor maximo de cada linha
-antes da exponenciacao (tecnica padrao, sem alteracao matematica no resultado).
+| Componente | Descrição |
+|---|---|
+| `softmax()` | Softmax estável numericamente implementada com `np.exp` |
+| `ScaledDotProductAttention` | Attention(Q,K,V) = softmax(QK^T / √dk) · V |
+| `layer_norm()` | Normalização por média e variância no último eixo |
+| `FeedForwardNetwork` | FFN(x) = max(0, xW1 + b1)W2 + b2 |
+| `EncoderLayer` | Um bloco completo com residual connections + LN |
+| Loop principal | Empilha N=6 camadas sequencialmente |
 
 ---
 
-## Exemplo de Input e Output Esperado
+## Parâmetros Utilizados
 
-    Input:
+| Parâmetro | Valor | Referência (paper) |
+|---|---|---|
+| `d_model` | 64 | 512 |
+| `d_ff` | 256 | 2048 |
+| `N` (camadas) | 6 | 6 |
+| `epsilon` (LayerNorm) | 1e-6 | — |
 
-    Q = [[1.0, 0.0],    K = [[1.0, 0.0],    V = [[1.0, 0.0],
-         [0.0, 1.0]]         [0.0, 1.0]]         [0.0, 1.0]]
-
-    Attention Weights (saida):
-
-    [[0.6742, 0.3258],
-     [0.3258, 0.6742]]
-
-    A primeira query presta mais atencao a primeira key (0.67 vs 0.33),
-    e a segunda query faz o oposto -- comportamento esperado pois
-    Q e K sao matrizes identidade.
-
-    Output:
-
-    [[0.6742, 0.0000],
-     [0.0000, 0.6742]]
+> O `d_model = 64` foi utilizado conforme permitido pelo enunciado para processamento em CPU.
 
 ---
 
-## Referencia
+## Nota de Crédito — Uso de IA Generativa
 
-Vaswani, A. et al. Attention Is All You Need. NeurIPS 2017.
-https://arxiv.org/abs/1706.03762
+Este projeto foi **desenvolvido com auxílio do Claude (Anthropic)**, ferramenta de IA Generativa.
 
-# eletiva-3
+A IA foi utilizada para:
+- Geração da estrutura base do código e implementação das equações matemáticas
+- Revisão de dimensionalidade dos tensores (broadcasting NumPy)
+- Verificação da correção do fluxo completo do Encoder
 
+Conforme as diretrizes do laboratório, o uso de IA Generativa foi empregado além do brainstorming de sintaxe. Este crédito é declarado em conformidade com a política de integridade acadêmica do enunciado.
+
+---
+
+## Referências
+
+- Vaswani, A. et al. (2017). *Attention Is All You Need*. NeurIPS.
