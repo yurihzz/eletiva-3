@@ -1,0 +1,12 @@
+# requirements.txt
+# Laboratório 05 – Transformer End-to-End Training
+
+# Deep Learning
+torch>=2.0.0
+
+# Hugging Face
+datasets>=2.14.0
+transformers>=4.35.0
+
+# Utilitários
+numpy>=1.24.0
